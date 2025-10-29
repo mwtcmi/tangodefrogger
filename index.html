@@ -4,13 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Tango de Frogger</title>
-  <!-- Make all relative URLs resolve from the current folder -->
   <base href="./">
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    canvas {
+      border: 2px solid #00ff7f;
+    }
+  </style>
 </head>
 <body>
   <canvas id="game" width="505" height="606"></canvas>
 
-  <!-- JS includes go here (Step 4) -->
-
+  <!-- Load scripts in correct order -->
+  <script src="scripts/main.js"></script>
+  <script src="scripts/score.js"></script>
+  <script src="scripts/theme-freepbx.js"></script>
 </body>
 </html>
