@@ -265,10 +265,20 @@ app.get('/api/leaderboard/sse', (req, res) => {
 // casual reload-and-replay. Loose regex covers crypto.randomUUID() and our
 // hex fallback.
 const CLIENT_ID_RE = /^[a-f0-9-]{16,64}$/i;
+// Contest is closed — freeze the board. Any new submission is rejected with a
+// friendly message the client surfaces to the player.
+const CONTEST_CLOSED = true;
 app.post('/api/score', scoreLimiter, (req, res) => {
   const { name, email, score, durationMs, nonce, signature, clientId } = req.body || {};
   const ip = req.ip;
   const ua = (req.get('user-agent') || '').slice(0, 256);
+  if (CONTEST_CLOSED) {
+    log('info', 'score_reject', { reason: 'contest_closed', ip, name: typeof name === 'string' ? name : null });
+    return res.status(403).json({
+      error: 'contest_closed',
+      message: 'Contest closed — winners will be announced soon.'
+    });
+  }
   const reject = (reason, status = 400) => {
     log('info', 'score_reject', { reason, ip, name: typeof name === 'string' ? name : null });
     return res.status(status).json({ error: reason });
@@ -475,8 +485,8 @@ footer.brand a:hover { text-decoration: underline; }
   <a class="cta merch" href="https://merch.sangoma.com/unisex-men-s-t-shirts" target="_blank" rel="noopener">Merch</a>
 </header>
 <main>
-  <div class="live"><span class="dot"></span>TOP 10 // LIVE<span class="sep">·</span><span id="players">—</span>&nbsp;PLAYERS</div>
-  <div class="notice">Winners verified before prizes are awarded</div>
+  <div class="live"><span class="dot"></span>TOP 10 // FINAL<span class="sep">·</span><span id="players">—</span>&nbsp;PLAYERS</div>
+  <div class="notice">Contest closed — winners will be announced soon</div>
   <div class="notice">New: <a href="https://github.com/mwtcmi/frogman" target="_blank" rel="noopener">Frogman</a> — headless FreePBX, 234 tools, plug in any AI</div>
   <table>
     <thead><tr><th>#</th><th>Name</th><th style="text-align:right">Score</th></tr></thead>
